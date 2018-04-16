@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<framework xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="schemas/frameworkDescriptionVersion1.1.4.xsd" name="Custom_" invoke="E:\OpenServer\domains\multiTable\node_modules\.bin\browserify.cmd" alias="browserify" enabled="true" version="2" />
+

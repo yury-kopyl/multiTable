@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>jquery.multiTable</title>
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<style>
+		.container {
+			height: 1200px;
+		}
+
+		.table td {
+			white-space: nowrap;
+		}
+
+		.mt-wrapper {
+			position: relative;
+			max-width: 100%;
+			overflow-x: auto;
+		}
+
+		.mt-head {
+			position: fixed;
+			background-color: lightblue;
+		}
+	</style>
+</head>
+<body>
+	<div class="container">
+		<table class="table multiTable">
+			<thead>
+				<tr>
+					<th>Column1</th>
+					<th>Column2</th>
+					<th>Column3</th>
+					<th>Column4</th>
+					<th>Column5</th>
+				</tr>
+			</thead>
+			<tr>
+				<td>Lorem ipsum dolor.</td>
+				<td>Lorem ipsum dolor sit amet.</td>
+				<td>Lorem ipsum dolor sit.</td>
+				<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+				<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+			</tr>
+		</table>
+	</div>
+	<script src="js/jquery-3.3.1.min.js"></script>
+	<script src="dist/jquery.multiTable.js"></script>
+	<script>
+		$('.multiTable').multiTable();
+	</script>
+</body>
+</html>
