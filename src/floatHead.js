@@ -1,26 +1,42 @@
+'use strict';
+
 import * as CONST from './constants';
 
-export default class floatHead {
+const FloatHead = FloatHead => class extends FloatHead {
 	constructor($table, options) {
-		this.init();
+		super($table, options);
 
-		this.options = $.extend({}, floatHead.defaults, options);
-		this.$table = $table;
-
-		this.createWrapper();
+		this.$float = undefined;
 	}
 
-	init() {
-		console.log('Init!');
+	initHead() {
+		console.info('init class FloatHead');
+
+		this.createFloat();
+		this.wrapFloat();
+		this.scrollFloatPage();
 	}
 
-	createWrapper() {
-		this.$table.wrap(`<div class="${CONST.CLASS_TABLE_WRAPPER}"/>`);
-		this.$table.before(`<table class="${CONST.CLASS_HEAD} table" style="width:${this.$table.outerWidth()}px;"></table>`);
-		this.$table.find('thead').clone().appendTo(`.${CONST.CLASS_HEAD}`);
-	};
-}
+	createFloat() {
+		this.$table.before(`<table class="${CONST.CLASS_FLOAT_TABLE}${this.options.floatHead.tableClass ? ' ' + this.options.floatHead.tableClass : ''}"/>`);
+		this.$float = this.$table.siblings(`.${CONST.CLASS_FLOAT_TABLE}`);
+		this.$table.find('colgroup').clone().appendTo(this.$float);
+		this.$table.find('thead').clone().appendTo(this.$float);
+	}
 
-floatHead.defaults = {
+	wrapFloat() {
+		this.$float.wrap(`<div class="${CONST.CLASS_FLOAT}"${this.options.colResize.isFixed ? ` style="width:${this.getData('tableWidth')}px;"` : ''}/>`);
+	}
 
+	scrollFloatPage() {
+		/* todo Позиция шапки при скроле страницы */
+		/*this.$window.scroll(event => {
+			console.log(
+				this.$wrap.offset().top,
+				this.$wrap.scrollTop()
+			);
+		});*/
+	}
 };
+
+export default FloatHead;

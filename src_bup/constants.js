@@ -1,19 +1,9 @@
 export const DATA_API = 'multiTable';
-
 export const DATA_COLUMNS_ID = 'resizable-columns-id';
 export const DATA_COLUMN_ID = 'resizable-column-id';
 export const DATA_TH = 'th';
 
-export const CLASS_WRAP = 'mt';
-
-export const CLASS_TABLE_COL = 'mt-table__col';
-
-export const CLASS_FLOAT = 'mt-float';
-export const CLASS_FLOAT_TABLE = 'mt-float__table';
-
-export const CLASS_RESIZE = 'mt-resize';
-export const CLASS_RESIZE_TABLE = 'mt-resize__table';
-
+export const CLASS_TABLE_WRAPPER = 'mt-wrapper';
 export const CLASS_TABLE_RESIZING = 'rc-table-resizing';
 export const CLASS_COLUMN_RESIZING = 'rc-column-resizing';
 export const CLASS_HEAD = 'mt-head';

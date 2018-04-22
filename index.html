@@ -9,11 +9,18 @@
 			height: 1200px;
 		}
 
-		.table td {
-			white-space: nowrap;
+		.multiTable_fixed {
+			table-layout: fixed;
+			width: auto;
 		}
 
-		.mt-wrapper {
+		.multiTable_fixed td {
+			white-space: nowrap;
+			text-overflow: ellipsis;
+			overflow: hidden;
+		}
+
+		.mt {
 			position: relative;
 			max-width: 100%;
 			overflow-x: auto;
@@ -23,12 +30,28 @@
 			position: fixed;
 			background-color: lightblue;
 		}
+
+		.mt-float {
+			position: absolute;
+			overflow: hidden;
+			width: 100%;
+		}
+
+		.mt-float__table {
+			background-color: cornflowerblue;
+		}
 	</style>
 </head>
 <body>
 	<div class="container">
 		<table class="table multiTable">
 			<thead>
+				<tr>
+					<th>Column1</th>
+					<th>Column2</th>
+					<th>Column3</th>
+					<th colspan="2">Column4</th>
+				</tr>
 				<tr>
 					<th>Column1</th>
 					<th>Column2</th>
@@ -49,7 +72,11 @@
 	<script src="js/jquery-3.3.1.min.js"></script>
 	<script src="dist/jquery.multiTable.js"></script>
 	<script>
-		$('.multiTable').multiTable();
+		$('.multiTable').multiTable({
+			colResize: {
+				isFixed: true
+			}
+		});
 	</script>
 </body>
 </html>
