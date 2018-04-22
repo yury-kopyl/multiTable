@@ -13,6 +13,7 @@ export const CLASS_FLOAT_TABLE = 'mt-float__table';
 
 export const CLASS_RESIZE = 'mt-resize';
 export const CLASS_RESIZE_TABLE = 'mt-resize__table';
+export const CLASS_RESIZE_HANDLE = 'mt-resize__handle';
 
 export const CLASS_TABLE_RESIZING = 'rc-table-resizing';
 export const CLASS_COLUMN_RESIZING = 'rc-column-resizing';

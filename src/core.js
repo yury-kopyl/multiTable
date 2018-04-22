@@ -40,6 +40,7 @@ export default class Table {
 			this.$table.addClass('multiTable_fixed');
 			this.$table.data('ui', this.setData( 'tableWidth', this.$table.outerWidth() ));
 		}
+		this.$table.data('ui', this.setData( 'tableHeight', this.$table.outerHeight() ));
 
 		this.wrapTable();
 		this.createCols();
