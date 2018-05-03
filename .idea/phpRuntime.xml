@@ -62,6 +62,7 @@
       <extension name="libevent" enabled="false" />
       <extension name="libsodium" enabled="false" />
       <extension name="libxml" enabled="false" />
+      <extension name="mailparse" enabled="false" />
       <extension name="mbstring" enabled="false" />
       <extension name="mcrypt" enabled="false" />
       <extension name="memcache" enabled="false" />
@@ -128,6 +129,7 @@
       <extension name="xmlrpc" enabled="false" />
       <extension name="xmlwriter" enabled="false" />
       <extension name="xsl" enabled="false" />
+      <extension name="yaf" enabled="false" />
       <extension name="yaml" enabled="false" />
       <extension name="zend" enabled="false" />
       <extension name="zip" enabled="false" />

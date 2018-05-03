@@ -5,16 +5,40 @@
 	<title>jquery.multiTable</title>
 	<link rel="stylesheet" href="css/bootstrap.min.css">
 	<style>
+		* {
+			box-sizing: border-box;
+		}
+
 		.container {
 			height: 1200px;
+			margin-top: 50px;
+		}
+
+		.multiTable {
+			table-layout: fixed;
+		}
+
+		.multiTable td {
+			word-break: break-all;
+		}
+
+		.multiTable colgroup {
+			display: table-header-group;
+		}
+
+		.multiTable col {
+			display: table-cell;
 		}
 
 		.multiTable_fixed {
-			table-layout: fixed;
 			width: auto;
+			max-width: unset;
 		}
 
-		.multiTable_fixed td {
+		.multiTable th,
+		.multiTable_fixed td,
+		.multiTable_fixed th,
+		.mt-float__table th {
 			white-space: nowrap;
 			text-overflow: ellipsis;
 			overflow: hidden;
@@ -26,19 +50,24 @@
 			overflow-x: auto;
 		}
 
-		.mt-head {
-			position: fixed;
-			background-color: lightblue;
+		.mt_resizing {
+			-moz-user-select: none;
+			-ms-user-select: none;
+			-khtml-user-select: none;
+			-webkit-user-select: none;
+			-webkit-touch-callout: none;
 		}
 
 		.mt-float {
 			position: absolute;
 			overflow: hidden;
 			width: 100%;
+			z-index: 1;
 		}
 
 		.mt-float__table {
 			background-color: cornflowerblue;
+			table-layout: fixed;
 		}
 
 		.mt-resize__handle {
@@ -46,21 +75,69 @@
 			width: 4px;
 			background-color: red;
 			transform: translateX(-50%);
-			z-index: 1;
+			z-index: 2;
 			cursor: col-resize;
+			bottom: 0;
+			top: 0;
+		}
+
+		.mt-resize__handle[data-noresize] {
+			display: none;
 		}
 	</style>
 </head>
 <body>
 	<div class="container">
-		<table class="table multiTable">
+		<table class="table multiTable" data-resizable-columns-id="products">
 			<thead>
 				<tr>
-					<th>Column1</th>
-					<th>Column2</th>
-					<th>Column3</th>
-					<th colspan="2">Column4</th>
+					<th data-resizable-column-id="column1">Column1</th>
+					<th data-resizable-column-id="column2">Column2</th>
+					<th data-resizable-column-id="column3">Column3</th>
+					<th data-resizable-column-id="column4">Column4</th>
+					<th data-resizable-column-id="column5">Column5</th>
 				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+			</tbody>
+		</table>
+		<!--<table class="table multiTable">
+			<thead>
 				<tr>
 					<th>Column1</th>
 					<th>Column2</th>
@@ -69,19 +146,245 @@
 					<th>Column5</th>
 				</tr>
 			</thead>
-			<tr>
-				<td>Lorem ipsum dolor.</td>
-				<td>Lorem ipsum dolor sit amet.</td>
-				<td>Lorem ipsum dolor sit.</td>
-				<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
-				<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
-			</tr>
+			<tbody>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+			</tbody>
 		</table>
+		<table class="table multiTable">
+			<thead>
+				<tr>
+					<th>Column1</th>
+					<th>Column2</th>
+					<th>Column3</th>
+					<th>Column4</th>
+					<th>Column5</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+			</tbody>
+		</table>
+		<table class="table multiTable">
+			<thead>
+				<tr>
+					<th>Column1</th>
+					<th>Column2</th>
+					<th>Column3</th>
+					<th>Column4</th>
+					<th>Column5</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+			</tbody>
+		</table>
+		<table class="table multiTable">
+			<thead>
+				<tr>
+					<th>Column1</th>
+					<th>Column2</th>
+					<th>Column3</th>
+					<th>Column4</th>
+					<th>Column5</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+			</tbody>
+		</table>
+		<table class="table multiTable">
+			<thead>
+				<tr>
+					<th>Column1</th>
+					<th>Column2</th>
+					<th>Column3</th>
+					<th>Column4</th>
+					<th>Column5</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+				<tr>
+					<td>Lorem ipsum dolor.</td>
+					<td>Lorem ipsum dolor sit amet.</td>
+					<td>Lorem ipsum dolor sit.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Accusamus.</td>
+					<td>Lorem ipsum dolor sit amet, consectetur adipisicing.</td>
+				</tr>
+			</tbody>
+		</table>-->
 	</div>
 	<script src="js/jquery-3.3.1.min.js"></script>
-	<script src="dist/jquery.multiTable.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/store.js/1.3.14/store.min.js"></script>
+	<script src="dist/jquery.resizableColumns.min.js"></script>
 	<script>
 		$('.multiTable').multiTable({
+			floatHead: {
+				tableClass: 'table'
+			},
 			colResize: {
 				isFixed: true
 			}

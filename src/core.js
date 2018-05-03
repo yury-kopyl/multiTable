@@ -4,23 +4,38 @@ import * as CONST from './constants';
 
 export default class Table {
 	constructor($table, options) {
-		Table.validateOptions(options);
+		this.initConfig(options);
+		// Table.validateOptions(options);
 
-		this.options = $.extend({}, Table.defaults, options);
 		this.$window = $(window);
 		this.$wrap = undefined;
 		this.$table = $table;
-		this.$tableHeads = this.$table.find('thead').find('tr:last-child').find('th');
-		this.$tableCols = undefined;
+		this.ui = {
+			wrapWidth:   0,
+			wrapHeight:  0,
+			tableWidth:  0,
+			resizeWidth: 0,
+			storePrefix: `${this.$table.attr(CONST.DATA_COLUMNS_ID)}_`
+		};
+		this.$tableHeads = this.$table.find('> thead:first').find('tr:first').find('th');
 
 		this.init();
+		this.changeInit = () => {
+			this.$window.off('resize');
+			console.log('off resize');
+		};
+	}
+
+	initConfig(options) {
+		let newOption = {
+			floatHead: $.extend({}, Table.defaults.floatHead, options.floatHead),
+			colResize: $.extend({}, Table.defaults.colResize, options.colResize)
+		};
+
+		this.options = $.extend({}, Table.defaults, newOption);
 	}
 
 	static validateOptions(options) {
-		if ( !options.colResize && !options.floatHead ) {
-			throw new Error(`Set any widget options(colResize/floatHead)`);
-		}
-
 		for(let key in options) {
 			if ( options.hasOwnProperty(key) && !(Table.defaults).hasOwnProperty(key) ) {
 				throw new Error(`option "${key}" does not exist`);
@@ -33,60 +48,109 @@ export default class Table {
 	}
 
 	init() {
-		console.info('init class Table');
-		this.$table.data('ui', {});
-
 		if ( this.options.colResize.isFixed ) {
 			this.$table.addClass('multiTable_fixed');
-			this.$table.data('ui', this.setData( 'tableWidth', this.$table.outerWidth() ));
 		}
-		this.$table.data('ui', this.setData( 'tableHeight', this.$table.outerHeight() ));
 
 		this.wrapTable();
-		this.createCols();
+		this.restoreColumnWidths();
 	}
 
 	wrapTable() {
+		/* Wrap table */
 		this.$table.wrap(`<div class="${CONST.CLASS_WRAP}"/>`);
-		this.$wrap = this.$table.parent(`.${CONST.CLASS_WRAP}`);
 
-		this.$table.data('ui', this.setData( 'wrapWidth', this.$table.parent(`.${CONST.CLASS_WRAP}`).outerWidth() ));
+		this.$wrap          = this.$table.parent(`.${CONST.CLASS_WRAP}`);
+		this.ui.tableWidth  = parseFloat(this.$table.css('width'));
+		this.ui.wrapHeight  = parseFloat(this.$wrap.css('height'));
+		this.ui.wrapWidth   = parseFloat(this.$wrap.css('width'));
+		this.ui.resizeWidth = this.ui.wrapWidth;
 	}
 
-	createCols() {
-		if ( !this.$table.find('col').length ) {
-			let $colgroup = $('<colgroup/>');
+	restoreColumnWidths() {
+		/* Get storage */
+		let store = {};
+		this.options.store.forEach((key, value) => {
+			if ( key.match(this.ui.storePrefix) ) {
+				store[key] = value;
+			}
+		});
 
-			for ( let i = 0; i < this.$tableHeads.length; i++ ) {
-				$colgroup.append(`<col class="${CONST.CLASS_TABLE_COL}"/>`);
+		/* If storage not empty and storage length heads !== table length heads OR changed type of fixed */
+		if ( (Object.keys(store).length !== this.$tableHeads.length + 2 && this.options.store) ||
+			(this.options.colResize.isFixed !== this.options.store.get(`${this.$table.attr(CONST.DATA_COLUMNS_ID)}__isFixed`)) ||
+			(!this.options.colResize.isFixed && this.ui.tableWidth !== Math.round(this.options.store.get(`${this.$table.attr(CONST.DATA_COLUMNS_ID)}__tableWidth`))) ) {
+			console.log(1);
+
+			for( let key in store ) {
+				if ( key.match(this.ui.storePrefix) ) {
+					this.options.store.remove(key);
+				}
 			}
 
-			this.$table.prepend($colgroup);
+			store = {};
 		}
 
-		this.$tableCols = this.$table.find('col').addClass(CONST.CLASS_TABLE_COL);
-	}
+		/* If was save storage */
+		if ( Object.keys(store).length ) {
+			console.log(2);
+			/* Get width of column from storage and set it */
+			this.$tableHeads.each((i, item) => {
+				let $item = $(item);
+				let width = this.options.store.get( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID) );
 
-	setData(key, value) {
-		return $.extend(this.$table.data('ui'), {[key]: value});
-	}
+				$item.css('width', width);
+			});
 
-	getData(key) {
-		let data = this.$table.data('ui');
+			/* Set table width from storage */
+			let tableWidth = this.options.store.get( this.ui.storePrefix + '_tableWidth');
+			this.$table.css('width', `${tableWidth}px`);
+			this.ui.tableWidth = tableWidth;
+		} else {
+			console.log(3);
+			/* Else table init first time */
+			let restWidth     = this.ui.tableWidth;
+			let newTableWidth = 0;
+			let countNotFixedHeads = this.$tableHeads.length;
 
-		if ( key ) {
-			return data[key];
+			this.$tableHeads.each((i, item) => {
+				let $item = $(item);
+
+				if ( $item.is(`[${CONST.DATA_WIDTH}]`) ) {
+					restWidth -= $item.attr(CONST.DATA_WIDTH);
+					countNotFixedHeads--;
+				}
+			});
+
+			this.$tableHeads.each((i, item) => {
+				let $item = $(item);
+				let width = $item.is(`[${CONST.DATA_WIDTH}]`) ? `${$item.attr('data-width')}px` : this.options.colResize.isFixed ? $item.css('width') : restWidth / countNotFixedHeads < this.options.colResize.minWidth ? `${this.options.colResize.minWidth}px` : `${restWidth / countNotFixedHeads}px`;
+
+				$item.css('width', width);
+				newTableWidth += parseFloat(width);
+
+				if ( this.$table.is(`[${CONST.DATA_COLUMNS_ID}]`) && this.options.store ) {
+					this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID), parseFloat(width) );
+				}
+			});
+
+			this.options.store.set( this.ui.storePrefix + '_tableWidth', newTableWidth );
+			this.options.store.set( this.ui.storePrefix + '_isFixed', this.options.colResize.isFixed );
+			this.$table.css('width', `${newTableWidth}px`);
+			this.ui.tableWidth = newTableWidth;
 		}
-
-		return data;
 	}
 };
 
 Table.defaults = {
 	floatHead: {
-		tableClass: 'table'
+		offsetTop: 0
 	},
-	colResize: false,
+	colResize: {
+		isFixed:  true,
+		minWidth: 50
+	},
+	store:     window.store,
 	string:    'test',
 	object:    {},
 	number:    100,
@@ -97,9 +161,10 @@ Table.defaults = {
 
 Table.typeDefaults = {
 	floatHead: 'object',
-	colResize: 'object',
+	colResize: 'boolean',
 	string:    'string',
 	object:    'object',
 	number:    'number',
-	fn:        'function'
+	fn:        'function',
+	notNeedRestore: 'boolean'
 };

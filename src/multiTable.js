@@ -8,13 +8,16 @@ export default class MultiTable extends ColResize(FloatHead(Table)) {
 	constructor($table, options) {
 		super($table, options);
 
-		this.initResize();
-		this.initHead();
 		this.play();
 	}
 
 	play() {
-		console.info('init class MultiTable');
-		// console.log(this);
+		if ( this.options.floatHead ) {
+			this.initHead();
+		}
+
+		if ( this.options.colResize ) {
+			this.initResize();
+		}
 	}
 };
