@@ -15,8 +15,6 @@ import {DATA_API} from './constants';
 				api = new MultiTable($table, optionsOrMethod);
 				$table.data(DATA_API, api);
 			} else if (typeof optionsOrMethod === 'string') {
-				console.log(optionsOrMethod);
-
 				return api[optionsOrMethod](...args);
 			}
 		});

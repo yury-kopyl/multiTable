@@ -4,11 +4,6 @@ import * as CONST from './constants';
 
 export default class Table {
 	constructor($table, options) {
-		this.initConfig(options);
-		// Table.validateOptions(options);
-
-		this.$window = $(window);
-		this.$wrap = undefined;
 		this.$table = $table;
 		this.ui = {
 			wrapWidth:   0,
@@ -17,12 +12,15 @@ export default class Table {
 			resizeWidth: 0,
 			storePrefix: `${this.$table.attr(CONST.DATA_COLUMNS_ID)}_`
 		};
-		this.$tableHeads = this.$table.find('> thead:first').find('tr:first').find('th');
+		this.initConfig(options);
+
+		this.$window = $(window);
+		this.$wrap = undefined;
+		this.$tableHeads = this.$table.find('> thead:first').find('tr:first').find('th:not(.kv-grid-hide)');
 
 		this.init();
 		this.changeInit = () => {
 			this.$window.off('resize');
-			console.log('off resize');
 		};
 	}
 
@@ -33,27 +31,31 @@ export default class Table {
 		};
 
 		this.options = $.extend({}, Table.defaults, newOption);
-	}
 
-	static validateOptions(options) {
-		for(let key in options) {
-			if ( options.hasOwnProperty(key) && !(Table.defaults).hasOwnProperty(key) ) {
-				throw new Error(`option "${key}" does not exist`);
-			}
+		let isElastic = this.options.store.get(`${this.ui.storePrefix}_isElastic`);
 
-			if ( options.hasOwnProperty(key) && typeof options[key] !== Table.typeDefaults[key] ) {
-				throw new Error(`option "${key}" haven't correct type: expected => ${typeof options[key]}, actual => ${Table.typeDefaults[key]}`);
-			}
-		}
+		this.options.colResize.isElastic = isElastic !== undefined ? isElastic : this.options.colResize.isElastic;
 	}
 
 	init() {
-		if ( this.options.colResize.isFixed ) {
-			this.$table.addClass('multiTable_fixed');
+		if (!Math.ceil10) {
+			let self = this;
+
+			Math.ceil10 = function(value, exp) {
+				return self.decimalAdjust('ceil', value, exp);
+			};
+		}
+
+		if (!Math.floor10) {
+			let self = this;
+
+			Math.floor10 = function(value, exp) {
+				return self.decimalAdjust('floor', value, exp);
+			};
 		}
 
 		this.wrapTable();
-		this.restoreColumnWidths();
+		this.setColumnsWidth();
 	}
 
 	wrapTable() {
@@ -61,13 +63,12 @@ export default class Table {
 		this.$table.wrap(`<div class="${CONST.CLASS_WRAP}"/>`);
 
 		this.$wrap          = this.$table.parent(`.${CONST.CLASS_WRAP}`);
-		this.ui.tableWidth  = parseFloat(this.$table.css('width'));
-		this.ui.wrapHeight  = parseFloat(this.$wrap.css('height'));
-		this.ui.wrapWidth   = parseFloat(this.$wrap.css('width'));
+		this.ui.wrapWidth   = this.getWidth(this.$wrap);
+		this.ui.wrapHeight  = this.getHeight(this.$wrap);
 		this.ui.resizeWidth = this.ui.wrapWidth;
 	}
 
-	restoreColumnWidths() {
+	setColumnsWidth() {
 		/* Get storage */
 		let store = {};
 		this.options.store.forEach((key, value) => {
@@ -77,13 +78,12 @@ export default class Table {
 		});
 
 		/* If storage not empty and storage length heads !== table length heads OR changed type of fixed */
-		if ( (Object.keys(store).length !== this.$tableHeads.length + 2 && this.options.store) ||
-			(this.options.colResize.isFixed !== this.options.store.get(`${this.$table.attr(CONST.DATA_COLUMNS_ID)}__isFixed`)) ||
-			(!this.options.colResize.isFixed && this.ui.tableWidth !== Math.round(this.options.store.get(`${this.$table.attr(CONST.DATA_COLUMNS_ID)}__tableWidth`))) ) {
-			console.log(1);
+		if ( (Object.keys(store).length - 2 !== this.$tableHeads.length) ||
+			(this.options.colResize.isElastic !== this.options.store.get(`${this.ui.storePrefix}_isElastic`)) ||
+			(!this.options.store.get(`${this.ui.storePrefix}_tableWidth`)) ) {
 
 			for( let key in store ) {
-				if ( key.match(this.ui.storePrefix) ) {
+				if ( store.hasOwnProperty(key) && key.match(this.ui.storePrefix) ) {
 					this.options.store.remove(key);
 				}
 			}
@@ -93,52 +93,154 @@ export default class Table {
 
 		/* If was save storage */
 		if ( Object.keys(store).length ) {
-			console.log(2);
 			/* Get width of column from storage and set it */
 			this.$tableHeads.each((i, item) => {
 				let $item = $(item);
 				let width = this.options.store.get( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID) );
 
-				$item.css('width', width);
+				$item.outerWidth(`${width}px`);
 			});
 
 			/* Set table width from storage */
 			let tableWidth = this.options.store.get( this.ui.storePrefix + '_tableWidth');
-			this.$table.css('width', `${tableWidth}px`);
+			this.$table.outerWidth(`${tableWidth}px`);
 			this.ui.tableWidth = tableWidth;
 		} else {
-			console.log(3);
 			/* Else table init first time */
-			let restWidth     = this.ui.tableWidth;
-			let newTableWidth = 0;
-			let countNotFixedHeads = this.$tableHeads.length;
+			if ( this.options.colResize.isElastic ) {
+				let $fixedCols			= this.$table.find('> thead:first').find('tr:first').find(`th[${CONST.DATA_WIDTH}]`);
+				let countNotFixedHeads	= this.$tableHeads.length - $fixedCols.length;
+				let headsSumWidth = 0;
 
-			this.$tableHeads.each((i, item) => {
-				let $item = $(item);
+				this.$tableHeads.each((i, item) => {
+					let $item = $(item);
+					let width = $item.is(`[${CONST.DATA_WIDTH}]`) ? +$item.attr(CONST.DATA_WIDTH) : this.getWidth($item);
 
-				if ( $item.is(`[${CONST.DATA_WIDTH}]`) ) {
-					restWidth -= $item.attr(CONST.DATA_WIDTH);
-					countNotFixedHeads--;
+					$item.data('width', width);
+					headsSumWidth += width;
+				});
+
+				headsSumWidth = Math.floor10(headsSumWidth, -1);
+
+				let remainder = this.ui.wrapWidth - headsSumWidth;
+				if ( remainder >= 0 ) {
+					headsSumWidth = this.ui.wrapWidth;
 				}
-			});
 
-			this.$tableHeads.each((i, item) => {
-				let $item = $(item);
-				let width = $item.is(`[${CONST.DATA_WIDTH}]`) ? `${$item.attr('data-width')}px` : this.options.colResize.isFixed ? $item.css('width') : restWidth / countNotFixedHeads < this.options.colResize.minWidth ? `${this.options.colResize.minWidth}px` : `${restWidth / countNotFixedHeads}px`;
+				this.$tableHeads.each((i, item) => {
+					let $item	 = $(item);
+					let width	 = $item.data('width');
+					let newWidth = remainder >= 0 && !$item.is(`[${CONST.DATA_WIDTH}]`) ? remainder / countNotFixedHeads + width : width;
 
-				$item.css('width', width);
-				newTableWidth += parseFloat(width);
+					$item.outerWidth(`${newWidth}px`);
+					this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID), newWidth );
+				});
 
-				if ( this.$table.is(`[${CONST.DATA_COLUMNS_ID}]`) && this.options.store ) {
-					this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID), parseFloat(width) );
+				this.$table.outerWidth(`${headsSumWidth}px`);
+				this.ui.tableWidth = headsSumWidth;
+				this.options.store.set( this.ui.storePrefix + '_tableWidth', headsSumWidth );
+			} else {
+				let $fixedCols			= this.$table.find('> thead:first').find('tr:first').find(`th[${CONST.DATA_WIDTH}]`);
+				let countNotFixedHeads	= this.$tableHeads.length - $fixedCols.length;
+				let headsSumWidth		= countNotFixedHeads * this.options.colResize.minWidth;
+
+				$fixedCols.each((i, item) => {
+					let $item = $(item);
+					let width = +$item.attr(CONST.DATA_WIDTH);
+
+					headsSumWidth += +$item.attr(CONST.DATA_WIDTH);
+					$item.outerWidth(`${width}px`);
+				});
+
+				if ( headsSumWidth < this.ui.wrapWidth ) {
+					this.$table.outerWidth(`${this.ui.wrapWidth}px`);
+					this.ui.tableWidth = this.ui.wrapWidth;
+					this.options.store.set( this.ui.storePrefix + '_tableWidth', this.ui.wrapWidth );
+
+					headsSumWidth = this.ui.wrapWidth;
+
+					$fixedCols.each((i, item) => {
+						headsSumWidth -= +$(item).attr(CONST.DATA_WIDTH);
+					});
+				} else {
+					this.$table.outerWidth(`${headsSumWidth}px`);
+					this.ui.tableWidth = headsSumWidth;
+					this.options.store.set( this.ui.storePrefix + '_tableWidth', headsSumWidth );
 				}
-			});
 
-			this.options.store.set( this.ui.storePrefix + '_tableWidth', newTableWidth );
-			this.options.store.set( this.ui.storePrefix + '_isFixed', this.options.colResize.isFixed );
-			this.$table.css('width', `${newTableWidth}px`);
-			this.ui.tableWidth = newTableWidth;
+				let width	  = parseInt(headsSumWidth / countNotFixedHeads);
+				let remainder = headsSumWidth - ( width * countNotFixedHeads );
+
+				this.$tableHeads.each((i, item) => {
+					let $item = $(item);
+
+					if ( !$item.is(`[${CONST.DATA_WIDTH}]`) ) {
+						$item.outerWidth(`${width}px`);
+						this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID), width );
+					} else {
+						this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID), parseInt(this.$tableHeads.eq(i).attr(CONST.DATA_WIDTH)) );
+					}
+				});
+
+				this.$tableHeads.each((i, item) => {
+					let $item = $(item);
+
+					if ( !$item.is(`[${CONST.DATA_WIDTH}]`) && remainder ) {
+						$item.outerWidth(`${width + remainder}px`);
+						this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID), width + remainder );
+						remainder = null;
+					}
+				});
+			}
+
+			this.options.store.set( this.ui.storePrefix + '_isElastic', this.options.colResize.isElastic );
+			/*if ( this.options.colResize.isElastic && this.ui.wrapWidth > newTableWidth ) {
+				this.$table.css('width', `${this.ui.wrapWidth}px`);
+				this.ui.tableWidth = this.ui.wrapWidth;
+			} else {
+				this.$table.css('width', `${newTableWidth}px`);
+				this.ui.tableWidth = newTableWidth;
+			}*/
 		}
+	}
+
+	getWidth(element) {
+		if ( element.nodeType === 1 ) {
+			return Math.ceil10(element.getBoundingClientRect().width, -1);
+		} else {
+			return Math.ceil10(element[0].getBoundingClientRect().width, -1);
+		}
+	}
+
+	getHeight(element) {
+		if ( element.nodeType === 1 ) {
+			return element.getBoundingClientRect().height;
+		} else {
+			return element[0].getBoundingClientRect().height;
+		}
+	}
+
+	decimalAdjust(type, value, exp) {
+		// Если степень не определена, либо равна нулю...
+		if (typeof exp === 'undefined' || +exp === 0) {
+			return Math[type](value);
+		}
+
+		value = +value;
+		exp = +exp;
+		// Если значение не является числом, либо степень не является целым числом...
+		if (isNaN(value) || !(typeof exp === 'number' && exp % 1 === 0)) {
+			return NaN;
+		}
+
+		// Сдвиг разрядов
+		value = value.toString().split('e');
+		value = Math[type](+(value[0] + 'e' + (value[1] ? (+value[1] - exp) : -exp)));
+
+		// Обратный сдвиг
+		value = value.toString().split('e');
+
+		return +(value[0] + 'e' + (value[1] ? (+value[1] + exp) : exp));
 	}
 };
 
@@ -147,24 +249,11 @@ Table.defaults = {
 		offsetTop: 0
 	},
 	colResize: {
-		isFixed:  true,
+		isElastic:  true,
 		minWidth: 50
 	},
 	store:     window.store,
-	string:    'test',
-	object:    {},
-	number:    100,
 	fn:        function () {
 		return true;
 	}
-};
-
-Table.typeDefaults = {
-	floatHead: 'object',
-	colResize: 'boolean',
-	string:    'string',
-	object:    'object',
-	number:    'number',
-	fn:        'function',
-	notNeedRestore: 'boolean'
 };

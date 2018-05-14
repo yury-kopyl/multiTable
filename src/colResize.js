@@ -34,7 +34,7 @@ const ColResize = ColResize => class extends ColResize {
 			this.$floatWrap.css('width', `${this.ui.tableWidth}px`);
 		}
 
-		this.$table.before(`<div class="${CONST.CLASS_RESIZE_TABLE}"${this.options.colResize.isFixed ? ` style="width:${this.ui.tableWidth}px"` : ''}/>`);
+		this.$table.before(`<div class="${CONST.CLASS_RESIZE_TABLE}"${this.options.colResize.isElastic ? ` style="width:${this.ui.tableWidth}px"` : ''}/>`);
 		this.$resize = this.$table.siblings(`.${CONST.CLASS_RESIZE_TABLE}`);
 
 		this.$tableHeads.each((i, item) => {
@@ -42,7 +42,7 @@ const ColResize = ColResize => class extends ColResize {
 			let left  	 = item.offsetLeft + item.offsetWidth;
 			let noresize = $item.attr('data-noresize');
 
-			if ( (this.options.colResize.isFixed) || (!this.options.colResize.isFixed && i !== this.$tableHeads.length - 1) ) {
+			if ( (!this.options.colResize.isElastic && i !== this.$tableHeads.length - 1) || this.options.colResize.isElastic ) {
 				this.$resize.append(`<div class="${CONST.CLASS_RESIZE_HANDLE}" style="left:${left}px;"${noresize === '' ? ' ' + CONST.DATA_NORESIZE : ''}/>`);
 			}
 		});
@@ -162,7 +162,7 @@ const ColResize = ColResize => class extends ColResize {
 				}
 
 				/* If last handler move behind table */
-				if ( this.options.colResize.isFixed && !this.operation.$nextColumn.length ) {
+				if ( this.options.colResize.isElastic && !this.operation.$nextColumn.length ) {
 					let newWidth = this.ui.tableWidth + this.operation.diffrence;
 
 					this.$floatWrap.css('width', `${newWidth}px`);
@@ -193,25 +193,25 @@ const ColResize = ColResize => class extends ColResize {
 	}
 
 	onWindowResize() {
-		if ( !this.options.colResize.isFixed ) {
-			this.$window.on('resize', () => {
-				let resizeWidth = this.$wrap.outerWidth();
+		this.$window.on('resize', () => {
+			let resizeWidth = this.$wrap.outerWidth();
 
-				if ( this.ui.resizeWidth !== resizeWidth ) {
-					this.options.store.set( this.ui.storePrefix + '_tableWidth', 0 );
-					this.unbindResize();
-					this.$resizeWrap.remove();
-					this.$floatWrap.remove();
-					this.$table.removeAttr('style');
-					this.$tableHeads.removeAttr('style');
-					this.init();
-					this.initHead();
-					this.initResize();
-					this.ui.resizeWidth = resizeWidth;
-					this.floatingHead();
-				}
-			});
-		}
+			if ( this.ui.resizeWidth !== resizeWidth || this.options.colResize.isElastic !== this.options.store.get(`${this.ui.storePrefix}_isElastic`) ) {
+				this.options.store.set( this.ui.storePrefix + '_tableWidth', 0 );
+				this.unbindResize();
+				this.$resizeWrap.remove();
+				this.$floatWrap.remove();
+				this.$table.unwrap();
+				this.$table.removeClass('multiTable_fixed');
+				this.$table.removeAttr('style');
+				this.$tableHeads.removeAttr('style');
+				this.init();
+				this.initHead();
+				this.initResize();
+				this.ui.resizeWidth = resizeWidth;
+				this.floatingHead();
+			}
+		});
 	}
 
 	getPointerX(event) {

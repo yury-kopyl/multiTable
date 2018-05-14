@@ -9,11 +9,8 @@ export const DATA_WIDTH = 'data-width';
 export const CLASS_WRAP = 'mt';
 export const CLASS_WRAP_RESIZING = 'mt_resizing';
 
-export const CLASS_TABLE_COL = 'mt-table__col';
-
 export const CLASS_FLOAT = 'mt-float';
 export const CLASS_FLOAT_TABLE = 'mt-float__table';
-export const CLASS_FLOAT_COL = 'mt-float__col';
 
 export const CLASS_RESIZE = 'mt-resize';
 export const CLASS_RESIZE_TABLE = 'mt-resize__table';
