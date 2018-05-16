@@ -142,65 +142,51 @@ export default class Table {
 			} else {
 				let $fixedCols			= this.$table.find('> thead:first').find('tr:first').find(`th[${CONST.DATA_WIDTH}]`);
 				let countNotFixedHeads	= this.$tableHeads.length - $fixedCols.length;
-				let headsSumWidth		= countNotFixedHeads * this.options.colResize.minWidth;
+				let headsSumWidth		= 0;
 
 				$fixedCols.each((i, item) => {
-					let $item = $(item);
-					let width = +$item.attr(CONST.DATA_WIDTH);
-
-					headsSumWidth += +$item.attr(CONST.DATA_WIDTH);
-					$item.outerWidth(`${width}px`);
+					headsSumWidth += +$(item).attr(CONST.DATA_WIDTH);
 				});
 
-				if ( headsSumWidth < this.ui.wrapWidth ) {
-					this.$table.outerWidth(`${this.ui.wrapWidth}px`);
-					this.ui.tableWidth = this.ui.wrapWidth;
-					this.options.store.set( this.ui.storePrefix + '_tableWidth', this.ui.wrapWidth );
+				headsSumWidth += countNotFixedHeads * this.options.colResize.minWidth;
 
-					headsSumWidth = this.ui.wrapWidth;
+				/* Если сумма ширины всех колонок больше чем ширина обёртки */
+				if ( headsSumWidth > this.ui.wrapWidth ) {
+					console.log(1);
+					this.$tableHeads.each((i, item) => {
+						let $item = $(item);
+						let width = $item.is(`[${CONST.DATA_WIDTH}]`) ? +$item.attr(CONST.DATA_WIDTH) : this.options.colResize.minWidth;
 
-					$fixedCols.each((i, item) => {
-						headsSumWidth -= +$(item).attr(CONST.DATA_WIDTH);
+						$item.outerWidth(`${width}px`);
+						this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID), width );
 					});
-				} else {
+
 					this.$table.outerWidth(`${headsSumWidth}px`);
 					this.ui.tableWidth = headsSumWidth;
 					this.options.store.set( this.ui.storePrefix + '_tableWidth', headsSumWidth );
-				}
+				} else {
+					console.log(2);
+					let newHeadsSumWidth = this.ui.wrapWidth;
 
-				let width	  = parseInt(headsSumWidth / countNotFixedHeads);
-				let remainder = headsSumWidth - ( width * countNotFixedHeads );
+					$fixedCols.each((i, item) => {
+						newHeadsSumWidth -= +$(item).attr(CONST.DATA_WIDTH);
+					});
 
-				this.$tableHeads.each((i, item) => {
-					let $item = $(item);
+					this.$tableHeads.each((i, item) => {
+						let $item = $(item);
+						let width = $item.is(`[${CONST.DATA_WIDTH}]`) ? +$item.attr(CONST.DATA_WIDTH) : newHeadsSumWidth / countNotFixedHeads;
 
-					if ( !$item.is(`[${CONST.DATA_WIDTH}]`) ) {
 						$item.outerWidth(`${width}px`);
 						this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID), width );
-					} else {
-						this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID), parseInt(this.$tableHeads.eq(i).attr(CONST.DATA_WIDTH)) );
-					}
-				});
+					});
 
-				this.$tableHeads.each((i, item) => {
-					let $item = $(item);
-
-					if ( !$item.is(`[${CONST.DATA_WIDTH}]`) && remainder ) {
-						$item.outerWidth(`${width + remainder}px`);
-						this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID), width + remainder );
-						remainder = null;
-					}
-				});
+					this.$table.outerWidth(`${newHeadsSumWidth}px`);
+					this.ui.tableWidth = newHeadsSumWidth;
+					this.options.store.set( this.ui.storePrefix + '_tableWidth', newHeadsSumWidth );
+				}
 			}
 
 			this.options.store.set( this.ui.storePrefix + '_isElastic', this.options.colResize.isElastic );
-			/*if ( this.options.colResize.isElastic && this.ui.wrapWidth > newTableWidth ) {
-				this.$table.css('width', `${this.ui.wrapWidth}px`);
-				this.ui.tableWidth = this.ui.wrapWidth;
-			} else {
-				this.$table.css('width', `${newTableWidth}px`);
-				this.ui.tableWidth = newTableWidth;
-			}*/
 		}
 	}
 
