@@ -152,7 +152,6 @@ export default class Table {
 
 				/* Если сумма ширины всех колонок больше чем ширина обёртки */
 				if ( headsSumWidth > this.ui.wrapWidth ) {
-					console.log(1);
 					this.$tableHeads.each((i, item) => {
 						let $item = $(item);
 						let width = $item.is(`[${CONST.DATA_WIDTH}]`) ? +$item.attr(CONST.DATA_WIDTH) : this.options.colResize.minWidth;
@@ -165,7 +164,6 @@ export default class Table {
 					this.ui.tableWidth = headsSumWidth;
 					this.options.store.set( this.ui.storePrefix + '_tableWidth', headsSumWidth );
 				} else {
-					console.log(2);
 					let newHeadsSumWidth = this.ui.wrapWidth;
 
 					$fixedCols.each((i, item) => {
@@ -180,9 +178,9 @@ export default class Table {
 						this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID), width );
 					});
 
-					this.$table.outerWidth(`${newHeadsSumWidth}px`);
-					this.ui.tableWidth = newHeadsSumWidth;
-					this.options.store.set( this.ui.storePrefix + '_tableWidth', newHeadsSumWidth );
+					this.$table.outerWidth(`${this.ui.wrapWidth}px`);
+					this.ui.tableWidth = this.ui.wrapWidth;
+					this.options.store.set( this.ui.storePrefix + '_tableWidth', this.ui.wrapWidth );
 				}
 			}
 
