@@ -165,6 +165,7 @@ export default class Table {
 					this.options.store.set( this.ui.storePrefix + '_tableWidth', headsSumWidth );
 				} else {
 					let newHeadsSumWidth = this.ui.wrapWidth;
+					let remainder = newHeadsSumWidth;
 
 					$fixedCols.each((i, item) => {
 						newHeadsSumWidth -= +$(item).attr(CONST.DATA_WIDTH);
@@ -172,7 +173,8 @@ export default class Table {
 
 					this.$tableHeads.each((i, item) => {
 						let $item = $(item);
-						let width = $item.is(`[${CONST.DATA_WIDTH}]`) ? +$item.attr(CONST.DATA_WIDTH) : newHeadsSumWidth / countNotFixedHeads;
+						let width = $item.is(`[${CONST.DATA_WIDTH}]`) ? +$item.attr(CONST.DATA_WIDTH) : Math.floor(newHeadsSumWidth / countNotFixedHeads);
+						remainder -= Math.floor(width);
 
 						$item.outerWidth(`${width}px`);
 						this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID), width );
@@ -181,6 +183,14 @@ export default class Table {
 					this.$table.outerWidth(`${this.ui.wrapWidth}px`);
 					this.ui.tableWidth = this.ui.wrapWidth;
 					this.options.store.set( this.ui.storePrefix + '_tableWidth', this.ui.wrapWidth );
+
+					if ( remainder ) {
+						let $item = this.$tableHeads.eq(Math.floor(this.$tableHeads.length / 2));
+						let width = $item.outerWidth() + remainder - document.documentMode ? 1 : 0;
+
+						$item.outerWidth(`${width}px`);
+						this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(Math.floor(this.$tableHeads.length / 2)).attr(CONST.DATA_COLUMN_ID), width );
+					}
 				}
 			}
 
