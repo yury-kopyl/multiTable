@@ -186,7 +186,7 @@ export default class Table {
 
 					if ( remainder ) {
 						let $item = this.$tableHeads.eq(Math.floor(this.$tableHeads.length / 2));
-						let width = $item.outerWidth() + remainder - document.documentMode ? 1 : 0;
+						let width = $item.outerWidth() + (remainder - 1);
 
 						$item.outerWidth(`${width}px`);
 						this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(Math.floor(this.$tableHeads.length / 2)).attr(CONST.DATA_COLUMN_ID), width );
