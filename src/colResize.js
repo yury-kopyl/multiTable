@@ -34,8 +34,8 @@ const ColResize = ColResize => class extends ColResize {
 			this.$floatWrap.css('width', `${this.ui.tableWidth}px`);
 		}
 
-		this.$table.before(`<div class="${CONST.CLASS_RESIZE_TABLE}"${this.options.colResize.isElastic ? ` style="width:${this.ui.tableWidth}px"` : ''}/>`);
-		this.$resize = this.$table.siblings(`.${CONST.CLASS_RESIZE_TABLE}`);
+		this.$wrapTable.before(`<div class="${CONST.CLASS_RESIZE_TABLE}"${this.options.colResize.isElastic ? ` style="width:${this.ui.tableWidth}px"` : ''}/>`);
+		this.$resize = this.$wrapTable.siblings(`.${CONST.CLASS_RESIZE_TABLE}`);
 
 		this.$tableHeads.each((i, item) => {
 			let $item 	 = $(item);
@@ -201,6 +201,7 @@ const ColResize = ColResize => class extends ColResize {
 				this.unbindResize();
 				this.$resizeWrap.remove();
 				this.$floatWrap.remove();
+				this.$table.unwrap();
 				this.$table.unwrap();
 				this.$table.removeClass('multiTable_fixed');
 				this.$table.removeAttr('style');

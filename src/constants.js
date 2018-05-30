@@ -7,6 +7,7 @@ export const DATA_NORESIZE = 'data-noresize';
 export const DATA_WIDTH = 'data-width';
 
 export const CLASS_WRAP = 'mt';
+export const CLASS_WRAP_TABLE = 'mt-table';
 export const CLASS_WRAP_RESIZING = 'mt_resizing';
 
 export const CLASS_FLOAT = 'mt-float';

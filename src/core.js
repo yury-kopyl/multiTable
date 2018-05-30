@@ -54,6 +54,8 @@ export default class Table {
 			};
 		}
 
+		this.options.colResize.isElastic ? this.$table.removeClass('js-floatThead_w100') : this.$table.addClass('js-floatThead_w100');
+
 		this.wrapTable();
 		this.setColumnsWidth();
 	}
@@ -63,6 +65,10 @@ export default class Table {
 		this.$table.wrap(`<div class="${CONST.CLASS_WRAP}"/>`);
 
 		this.$wrap          = this.$table.parent(`.${CONST.CLASS_WRAP}`);
+
+		this.$table.wrap(`<div class="${CONST.CLASS_WRAP_TABLE}"/>`);
+
+		this.$wrapTable		= this.$table.parent(`.${CONST.CLASS_WRAP_TABLE}`);
 		this.ui.wrapWidth   = this.getWidth(this.$wrap);
 		this.ui.wrapHeight  = this.getHeight(this.$wrap);
 		this.ui.resizeWidth = this.ui.wrapWidth;
@@ -103,7 +109,7 @@ export default class Table {
 
 			/* Set table width from storage */
 			let tableWidth = this.options.store.get( this.ui.storePrefix + '_tableWidth');
-			this.$table.outerWidth(`${tableWidth}px`);
+			this.$wrapTable.outerWidth(`${tableWidth}px`);
 			this.ui.tableWidth = tableWidth;
 		} else {
 			/* Else table init first time */
@@ -136,7 +142,7 @@ export default class Table {
 					this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID), newWidth );
 				});
 
-				this.$table.outerWidth(`${headsSumWidth}px`);
+				this.$wrapTable.outerWidth(`${headsSumWidth}px`);
 				this.ui.tableWidth = headsSumWidth;
 				this.options.store.set( this.ui.storePrefix + '_tableWidth', headsSumWidth );
 			} else {
@@ -160,7 +166,7 @@ export default class Table {
 						this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID), width );
 					});
 
-					this.$table.outerWidth(`${headsSumWidth}px`);
+					this.$wrapTable.outerWidth(`${headsSumWidth}px`);
 					this.ui.tableWidth = headsSumWidth;
 					this.options.store.set( this.ui.storePrefix + '_tableWidth', headsSumWidth );
 				} else {
@@ -180,7 +186,7 @@ export default class Table {
 						this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID), width );
 					});
 
-					this.$table.outerWidth(`${this.ui.wrapWidth}px`);
+					this.$wrapTable.outerWidth(`${this.ui.wrapWidth}px`);
 					this.ui.tableWidth = this.ui.wrapWidth;
 					this.options.store.set( this.ui.storePrefix + '_tableWidth', this.ui.wrapWidth );
 

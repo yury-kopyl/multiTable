@@ -17,8 +17,8 @@ const FloatHead = FloatHead => class extends FloatHead {
 	}
 
 	createFloat() {
-		this.$table.before(`<table class="${CONST.CLASS_FLOAT_TABLE + (this.options.floatHead.tableClass ? ' ' + this.options.floatHead.tableClass : '')}"/>`);
-		this.$float = this.$table.siblings(`.${CONST.CLASS_FLOAT_TABLE}`);
+		this.$wrapTable.before(`<table class="${CONST.CLASS_FLOAT_TABLE + (this.options.floatHead.tableClass ? ' ' + this.options.floatHead.tableClass : '')}"/>`);
+		this.$float = this.$wrapTable.siblings(`.${CONST.CLASS_FLOAT_TABLE}`);
 
 		this.$table.find('> thead').clone().appendTo(this.$float);
 
