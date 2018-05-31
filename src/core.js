@@ -58,6 +58,7 @@ export default class Table {
 
 		this.wrapTable();
 		this.setColumnsWidth();
+		this.checkScroll();
 	}
 
 	wrapTable() {
@@ -110,6 +111,9 @@ export default class Table {
 			/* Set table width from storage */
 			let tableWidth = this.options.store.get( this.ui.storePrefix + '_tableWidth');
 			this.$wrapTable.outerWidth(`${tableWidth}px`);
+			if ( this.options.colResize.isElastic ) {
+				this.$table.outerWidth(`${tableWidth}px`);
+			}
 			this.ui.tableWidth = tableWidth;
 		} else {
 			/* Else table init first time */
@@ -143,6 +147,7 @@ export default class Table {
 				});
 
 				this.$wrapTable.outerWidth(`${headsSumWidth}px`);
+				this.$table.outerWidth(`${headsSumWidth}px`);
 				this.ui.tableWidth = headsSumWidth;
 				this.options.store.set( this.ui.storePrefix + '_tableWidth', headsSumWidth );
 			} else {
@@ -201,6 +206,23 @@ export default class Table {
 			}
 
 			this.options.store.set( this.ui.storePrefix + '_isElastic', this.options.colResize.isElastic );
+		}
+	}
+
+	checkScroll() {
+		let storeTableWidth = this.options.store.get( this.ui.storePrefix + '_tableWidth' );
+
+		if ( !this.options.colResize.isElastic && this.ui.wrapWidth !== storeTableWidth ) {
+			let remainder = this.ui.wrapWidth - storeTableWidth;
+			let $item = this.$tableHeads.eq(Math.floor(this.$tableHeads.length / 2));
+			let width = $item.outerWidth() + remainder;
+
+			$item.outerWidth(`${width}px`);
+			this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(Math.floor(this.$tableHeads.length / 2)).attr(CONST.DATA_COLUMN_ID), width );
+			this.$wrapTable.outerWidth(`${storeTableWidth + remainder}px`);
+			this.$table.outerWidth(`${storeTableWidth + remainder}px`);
+			this.ui.tableWidth = storeTableWidth + remainder;
+			this.options.store.set( this.ui.storePrefix + '_tableWidth', storeTableWidth + remainder );
 		}
 	}
 
