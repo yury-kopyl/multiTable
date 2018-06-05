@@ -165,9 +165,9 @@ const ColResize = ColResize => class extends ColResize {
 				if ( this.options.colResize.isElastic && !this.operation.$nextColumn.length ) {
 					let newWidth = this.ui.tableWidth + this.operation.diffrence;
 
-					this.$floatWrap.css('width', `${newWidth}px`);
-					this.$table.css('width', `${newWidth}px`);
-					this.$resize.css('width', `${newWidth}px`);
+					this.$floatWrap.outerWidth(`${newWidth}px`);
+					this.$wrapTable.outerWidth(`${newWidth}px`);
+					this.$resize.outerWidth(`${newWidth}px`);
 
 					this.ui.tableWidth = newWidth;
 
@@ -203,8 +203,9 @@ const ColResize = ColResize => class extends ColResize {
 				this.$floatWrap.remove();
 				this.$table.unwrap();
 				this.$table.unwrap();
-				this.$table.removeClass('multiTable_fixed');
-				this.$table.removeAttr('style');
+				this.$table.removeClass('js-floatThead_w100');
+				this.$table.removeClass('js-floatThead_elastic');
+				this.$wrapTable.removeAttr('style');
 				this.$tableHeads.removeAttr('style');
 				this.init();
 				this.initHead();

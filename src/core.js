@@ -59,6 +59,8 @@ export default class Table {
 		this.wrapTable();
 		this.setColumnsWidth();
 		this.checkScroll();
+
+		!this.options.colResize.isElastic ? this.$table.removeClass('js-floatThead_elastic') : this.$table.addClass('js-floatThead_elastic');
 	}
 
 	wrapTable() {
@@ -147,7 +149,6 @@ export default class Table {
 				});
 
 				this.$wrapTable.outerWidth(`${headsSumWidth}px`);
-				this.$table.outerWidth(`${headsSumWidth}px`);
 				this.ui.tableWidth = headsSumWidth;
 				this.options.store.set( this.ui.storePrefix + '_tableWidth', headsSumWidth );
 			} else {
