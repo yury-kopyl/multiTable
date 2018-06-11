@@ -55,6 +55,9 @@ export default class Table {
 		}
 
 		this.options.colResize.isElastic ? this.$table.removeClass('js-floatThead_w100') : this.$table.addClass('js-floatThead_w100');
+		if ( this.$table.attr('data-width') ) {
+			this.options.colResize.isElastic ? this.$table.parents('.table-responsive').removeClass('js-floatThead_w75') : this.$table.parents('.table-responsive').addClass('js-floatThead_w75');
+		}
 
 		this.wrapTable();
 		this.setColumnsWidth();
