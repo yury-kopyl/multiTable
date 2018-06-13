@@ -83,14 +83,22 @@ export default class Table {
 	setColumnsWidth() {
 		/* Get storage */
 		let store = {};
+		let isChangedCols = false;
+
 		this.options.store.forEach((key, value) => {
 			if ( key.match(this.ui.storePrefix) ) {
+				let newKey = key.replace(this.ui.storePrefix, "");
+
+				if ( newKey !== '_tableWidth' && newKey !== '_isElastic' ) {
+					this.$table.find('th[data-resizable-column-id="' + newKey + '"]').length ? isChangedCols = true : false;
+				}
+
 				store[key] = value;
 			}
 		});
 
 		/* If storage not empty and storage length heads !== table length heads OR changed type of fixed */
-		if ( (Object.keys(store).length - 2 !== this.$tableHeads.length) ||
+		if ( (Object.keys(store).length - 2 !== this.$tableHeads.length || isChangedCols) ||
 			(this.options.colResize.isElastic !== this.options.store.get(`${this.ui.storePrefix}_isElastic`)) ||
 			(!this.options.store.get(`${this.ui.storePrefix}_tableWidth`)) ) {
 
@@ -142,14 +150,30 @@ export default class Table {
 					headsSumWidth = this.ui.wrapWidth;
 				}
 
-				this.$tableHeads.each((i, item) => {
+				/*this.$tableHeads.each((i, item) => {
 					let $item	 = $(item);
 					let width	 = $item.data('width');
 					let newWidth = remainder >= 0 && !$item.is(`[${CONST.DATA_WIDTH}]`) ? remainder / countNotFixedHeads + width : width;
 
 					$item.outerWidth(`${newWidth}px`);
 					this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID), newWidth );
+				});*/
+
+				this.$tableHeads.each((i, item) => {
+					let $item	 = $(item);
+					let width	 = $item.data('width');
+
+					$item.outerWidth(`${width}px`);
+					this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(i).attr(CONST.DATA_COLUMN_ID), width );
 				});
+
+				if ( remainder >= 0 ) {
+					let $lastItem = this.$tableHeads.eq(this.$tableHeads.length - 1);
+					let lastItemWidth = $lastItem.data('width') + remainder;
+
+					$lastItem.outerWidth(`${lastItemWidth}px`);
+					this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(this.$tableHeads.length - 1).attr(CONST.DATA_COLUMN_ID), lastItemWidth );
+				}
 
 				this.$wrapTable.outerWidth(`${headsSumWidth}px`);
 				this.ui.tableWidth = headsSumWidth;
@@ -215,9 +239,9 @@ export default class Table {
 
 	checkScroll() {
 		let storeTableWidth = this.options.store.get( this.ui.storePrefix + '_tableWidth' );
+		let remainder = this.ui.wrapWidth - storeTableWidth;
 
-		if ( !this.options.colResize.isElastic && this.ui.wrapWidth !== storeTableWidth ) {
-			let remainder = this.ui.wrapWidth - storeTableWidth;
+		if ( !this.options.colResize.isElastic && this.ui.wrapWidth !== storeTableWidth && remainder > 0 ) {
 			let $item = this.$tableHeads.eq(Math.floor(this.$tableHeads.length / 2));
 			let width = $item.outerWidth() + remainder;
 
