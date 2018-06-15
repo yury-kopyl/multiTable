@@ -90,7 +90,7 @@ export default class Table {
 				let newKey = key.replace(this.ui.storePrefix, "");
 
 				if ( newKey !== '_tableWidth' && newKey !== '_isElastic' ) {
-					this.$table.find('th[data-resizable-column-id="' + newKey + '"]').length ? isChangedCols = true : false;
+					!this.$table.find('th[data-resizable-column-id="' + newKey + '"]').length ? isChangedCols = true : false;
 				}
 
 				store[key] = value;
