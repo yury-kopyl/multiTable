@@ -205,6 +205,7 @@ const ColResize = ColResize => class extends ColResize {
 				this.$table.unwrap();
 				this.$table.removeClass('js-floatThead_w100');
 				this.$table.removeClass('js-floatThead_elastic');
+				this.$table.removeAttr('style');
 				this.$wrapTable.removeAttr('style');
 				this.$tableHeads.removeAttr('style');
 				this.init();

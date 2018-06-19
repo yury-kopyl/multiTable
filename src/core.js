@@ -131,8 +131,8 @@ export default class Table {
 		} else {
 			/* Else table init first time */
 			if ( this.options.colResize.isElastic ) {
-				let $fixedCols			= this.$table.find('> thead:first').find('tr:first').find(`th[${CONST.DATA_WIDTH}]`);
-				let countNotFixedHeads	= this.$tableHeads.length - $fixedCols.length;
+				/*let $fixedCols			= this.$table.find('> thead:first').find('tr:first').find(`th[${CONST.DATA_WIDTH}]`);*/
+				/*let countNotFixedHeads	= this.$tableHeads.length - $fixedCols.length;*/
 				let headsSumWidth = 0;
 
 				this.$tableHeads.each((i, item) => {
@@ -175,6 +175,7 @@ export default class Table {
 					this.options.store.set( this.ui.storePrefix + this.$tableHeads.eq(this.$tableHeads.length - 1).attr(CONST.DATA_COLUMN_ID), lastItemWidth );
 				}
 
+				this.$table.outerWidth(`${headsSumWidth}px`);
 				this.$wrapTable.outerWidth(`${headsSumWidth}px`);
 				this.ui.tableWidth = headsSumWidth;
 				this.options.store.set( this.ui.storePrefix + '_tableWidth', headsSumWidth );
