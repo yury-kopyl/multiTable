@@ -124,11 +124,20 @@ const ColResize = ColResize => class extends ColResize {
 				return;
 			}
 
-			if ( (this.operation.$currentColumn.attr('data-width') && difference < this.operation.$currentColumn.attr('data-width') - this.operation.$currentColumn.outerWidth() && difference < 0) ||
-				(this.operation.$nextColumn.attr('data-width') && difference > this.operation.$nextColumn.outerWidth() - this.operation.$nextColumn.attr('data-width') && difference > 0) ||
-				(!this.operation.$currentColumn.attr('data-width') && difference < this.options.colResize.minWidth - this.operation.$currentColumn.outerWidth() && difference < 0) ||
-				(this.operation.$nextColumn.length && !this.operation.$nextColumn.attr('data-width') && difference > this.operation.$nextColumn.outerWidth() - this.options.colResize.minWidth && difference > 0) ) {
-				return;
+			if ( this.options.colResize.isElastic ) {
+				if ( (this.operation.$currentColumn.attr('data-width') && difference < this.operation.$currentColumn.attr('data-width') - this.operation.$currentColumn.outerWidth() && difference < 0) ||
+					(this.operation.$nextColumn.attr('data-width') && difference > this.operation.$nextColumn.outerWidth() - this.operation.$nextColumn.attr('data-width') && difference > 0) ||
+					(!this.operation.$currentColumn.attr('data-width') && difference < this.options.colResize.minFlexWidth - this.operation.$currentColumn.outerWidth() && difference < 0) ||
+					(this.operation.$nextColumn.length && !this.operation.$nextColumn.attr('data-width') && difference > this.operation.$nextColumn.outerWidth() - this.options.colResize.minFlexWidth && difference > 0) ) {
+					return;
+				}
+			} else {
+				if ( (this.operation.$currentColumn.attr('data-width') && difference < this.operation.$currentColumn.attr('data-width') - this.operation.$currentColumn.outerWidth() && difference < 0) ||
+					(this.operation.$nextColumn.attr('data-width') && difference > this.operation.$nextColumn.outerWidth() - this.operation.$nextColumn.attr('data-width') && difference > 0) ||
+					(!this.operation.$currentColumn.attr('data-width') && difference < this.options.colResize.minWidth - this.operation.$currentColumn.outerWidth() && difference < 0) ||
+					(this.operation.$nextColumn.length && !this.operation.$nextColumn.attr('data-width') && difference > this.operation.$nextColumn.outerWidth() - this.options.colResize.minWidth && difference > 0) ) {
+					return;
+				}
 			}
 
 			if ( this.operation.currentIndex + 1 === this.$resizeHandles.length && difference > 0 ) {
@@ -168,6 +177,7 @@ const ColResize = ColResize => class extends ColResize {
 					this.$floatWrap.outerWidth(`${newWidth}px`);
 					this.$wrapTable.outerWidth(`${newWidth}px`);
 					this.$resize.outerWidth(`${newWidth}px`);
+					this.$table.outerWidth(`${newWidth}px`);
 
 					this.ui.tableWidth = newWidth;
 

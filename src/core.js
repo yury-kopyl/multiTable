@@ -301,7 +301,8 @@ Table.defaults = {
 	},
 	colResize: {
 		isElastic:  true,
-		minWidth: 50
+		minWidth: 122,
+		minFlexWidth: 55
 	},
 	store:     window.store,
 	fn:        function () {
